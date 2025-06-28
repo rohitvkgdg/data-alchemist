@@ -1,0 +1,70 @@
+import { useState } from "react";
+import { Upload, BarChart3, Table, FileText, Settings } from "lucide-react";
+import {
+    Sidebar,
+    SidebarContent,
+    SidebarGroup,
+    SidebarGroupContent,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+    SidebarHeader,
+    SidebarTrigger,
+} from "@/components/ui/sidebar";
+import { useSidebar } from "@/components/ui/sidebar";
+
+const navigation = [
+    { name: "Upload Data", href: "#", icon: Upload, current: true },
+    { name: "Visualize", href: "#", icon: BarChart3, current: false },
+    { name: "Data Table", href: "#", icon: Table, current: false },
+    { name: "Reports", href: "#", icon: FileText, current: false },
+    { name: "Settings", href: "#", icon: Settings, current: false },
+];
+
+export function AppSidebar() {
+    const { state, isMobile } = useSidebar();
+    const isCollapsed = state === "collapsed";
+    return (
+        <Sidebar collapsible="icon">
+            <SidebarHeader>
+                {isMobile ? (
+                    <div className="flex items-center justify-between p-2">
+                        <h2 className="text-lg font-thin">Data Alchemist</h2>
+                        <SidebarTrigger />
+                    </div>
+                ) : (
+                    // Desktop behavior with collapse
+                    state === "collapsed" ? (
+                        <SidebarTrigger className="w-8 h-8 mt-2">
+                            <span className="sr-only">Toggle Sidebar</span>
+                        </SidebarTrigger>
+                    ) : (
+                        <div className="flex items-center justify-between p-2">
+                            <h2 className="text-lg font-thin">Data Alchemist</h2>
+                            <SidebarTrigger />
+                        </div>
+                    )
+                )}
+
+            </SidebarHeader>
+            <SidebarContent>
+                <SidebarGroup>
+                    <SidebarGroupContent>
+                        <SidebarMenu className="flex flex-col gap-1">
+                            {navigation.map((item) => (
+                                <SidebarMenuItem key={item.name}>
+                                    <SidebarMenuButton asChild isActive={item.current} className="py-5">
+                                        <a href={item.href}>
+                                            <item.icon />
+                                            <span>{item.name}</span>
+                                        </a>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            ))}
+                        </SidebarMenu>
+                    </SidebarGroupContent>
+                </SidebarGroup>
+            </SidebarContent>
+        </Sidebar>
+    );
+}
