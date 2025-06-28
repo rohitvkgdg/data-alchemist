@@ -119,6 +119,11 @@ export const useDataStore = create<DataStore>((set, get) => ({
       const existingErrors = taskValidationResults?.errors || [];
       const allErrors = [...existingErrors, ...allNewErrors];
       
+      // Calculate unique invalid rows (same logic as parser and data analyzer)
+      // Exclude row 0 errors (missing columns, file-level issues) from data row count
+      const dataRowErrors = allErrors.filter(error => error.row > 0);
+      const uniqueInvalidRows = new Set(dataRowErrors.map(error => error.row)).size;
+      
       // Update task validation results with all cross-validation errors
       const updatedValidation: ValidationResult<Task> = {
         isValid: allErrors.length === 0,
@@ -127,8 +132,8 @@ export const useDataStore = create<DataStore>((set, get) => ({
         validData: taskValidationResults?.validData || [],
         summary: {
           totalRows: tasks.length,
-          validRows: tasks.length - allErrors.length,
-          invalidRows: allErrors.length
+          validRows: tasks.length - uniqueInvalidRows,
+          invalidRows: uniqueInvalidRows
         }
       };
       

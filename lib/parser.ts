@@ -94,6 +94,21 @@ export class FileParser {
         const validData: Record<string, unknown>[] = [];
         const allData: Record<string, unknown>[] = [];
 
+        // Ensure we start with clean data arrays
+        if (data.length === 0) {
+            return {
+                isValid: true,
+                errors: [],
+                data: [],
+                validData: [],
+                summary: {
+                    totalRows: 0,
+                    validRows: 0,
+                    invalidRows: 0
+                }
+            };
+        }
+
         // 1. Check for missing required columns
         const missingColumnErrors = this.validateMissingRequiredColumns(data, dataType);
         errors.push(...missingColumnErrors);
@@ -172,6 +187,12 @@ export class FileParser {
             errors.push(...durationErrors);
         }
 
+        // Calculate unique invalid rows based on actual errors
+        // Exclude row 0 errors (missing columns, file-level issues) from data row count
+        const dataRowErrors = errors.filter(error => error.row > 0);
+        const invalidRowNumbers = new Set(dataRowErrors.map(error => error.row));
+        const uniqueInvalidRows = invalidRowNumbers.size;
+
         return {
             isValid: errors.length === 0,
             errors,
@@ -179,8 +200,8 @@ export class FileParser {
             validData, // Keep valid data separate for other uses
             summary: {
                 totalRows: data.length,
-                validRows: validData.length,
-                invalidRows: data.length - validData.length
+                validRows: data.length - uniqueInvalidRows,
+                invalidRows: uniqueInvalidRows
             }
         };
     }
@@ -337,7 +358,7 @@ export class FileParser {
                             errors.push({
                                 row: rowNumber,
                                 field: 'hourlyRate',
-                                message: 'Hourly rate cannot be negative',
+                                message: `Hourly rate cannot be negative (ID: ${row.id})`,
                                 value: String(row.hourlyRate)
                             });
                         } else if (hourlyRate > 1000) {
@@ -352,21 +373,21 @@ export class FileParser {
                 }
                 
                 // Validate max hours per week (check capacity field for workers data)
-                const capacityField = row.capacity || row.maxHoursPerWeek;
+                const capacityField = row.capacity || row.maxHoursPerWeek || row.maxLoadPerPhase;
                 if (capacityField !== null && capacityField !== undefined && capacityField !== '') {
                     const maxHours = Number(capacityField);
                     if (!isNaN(maxHours)) {
                         if (maxHours < 1) {
                             errors.push({
                                 row: rowNumber,
-                                field: 'capacity',
+                                field: 'maxLoadPerPhase',
                                 message: 'Max hours per week must be at least 1',
                                 value: String(capacityField)
                             });
                         } else if (maxHours > 168) {
                             errors.push({
                                 row: rowNumber,
-                                field: 'capacity',
+                                field: 'maxLoadPerPhase',
                                 message: 'Max hours per week cannot exceed 168 hours (24×7)',
                                 value: String(capacityField)
                             });

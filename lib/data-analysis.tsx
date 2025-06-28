@@ -45,9 +45,11 @@ export class DataAnalyzer {
     // Calculate status distribution
     const statusDistribution = this.calculateDistribution(clients, 'status');
 
-    // Calculate valid records based on validation results
-    const errorRows = validationResults?.errors ? 
-      new Set(validationResults.errors.map(error => error.row)).size : 0;
+    // Calculate valid records based on validation results (exclude row 0 errors)
+    const dataRowErrors = validationResults?.errors ? 
+      validationResults.errors.filter(error => error.row > 0) : [];
+    const errorRows = dataRowErrors.length > 0 ? 
+      new Set(dataRowErrors.map(error => error.row)).size : 0;
     const validRecords = total - errorRows;
     const invalidRecords = errorRows;
     const validationRate = total > 0 ? Math.round((validRecords / total) * 100) : 0;
@@ -76,9 +78,11 @@ export class DataAnalyzer {
 
     const statusDistribution = this.calculateDistribution(workers, 'status');
 
-    // Calculate valid records based on validation results
-    const errorRows = validationResults?.errors ? 
-      new Set(validationResults.errors.map(error => error.row)).size : 0;
+    // Calculate valid records based on validation results (exclude row 0 errors)
+    const dataRowErrors = validationResults?.errors ? 
+      validationResults.errors.filter(error => error.row > 0) : [];
+    const errorRows = dataRowErrors.length > 0 ? 
+      new Set(dataRowErrors.map(error => error.row)).size : 0;
     const validRecords = total - errorRows;
     const invalidRecords = errorRows;
     const validationRate = total > 0 ? Math.round((validRecords / total) * 100) : 0;
@@ -107,9 +111,11 @@ export class DataAnalyzer {
 
     const statusDistribution = this.calculateDistribution(tasks, 'status');
 
-    // Calculate valid records based on validation results
-    const errorRows = validationResults?.errors ? 
-      new Set(validationResults.errors.map(error => error.row)).size : 0;
+    // Calculate valid records based on validation results (exclude row 0 errors)
+    const dataRowErrors = validationResults?.errors ? 
+      validationResults.errors.filter(error => error.row > 0) : [];
+    const errorRows = dataRowErrors.length > 0 ? 
+      new Set(dataRowErrors.map(error => error.row)).size : 0;
     const validRecords = total - errorRows;
     const invalidRecords = errorRows;
     const validationRate = total > 0 ? Math.round((validRecords / total) * 100) : 0;

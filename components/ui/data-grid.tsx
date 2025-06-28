@@ -49,6 +49,9 @@ export function DataGrid<T>({
   const [editingRows, setEditingRows] = useState<Set<number>>(new Set());
   const [editingData, setEditingData] = useState<Record<number, Partial<T>>>({});
 
+  // Filter out row 0 errors (file-level/structural issues) for display
+  const dataRowErrors = validationErrors.filter(error => error.row > 0);
+
   const table = useReactTable({
     data,
     columns,
@@ -105,20 +108,9 @@ export function DataGrid<T>({
   };
 
   const getRowErrors = (rowIndex: number) => {
-    // Try multiple strategies to match errors
-    const strategies = [
-      validationErrors.filter(error => error.row === rowIndex + 1), // 1-based (most common)
-      validationErrors.filter(error => error.row === rowIndex),     // 0-based
-    ];
-    
-    // Return the first strategy that has results
-    for (let i = 0; i < strategies.length; i++) {
-      if (strategies[i].length > 0) {
-        return strategies[i];
-      }
-    }
-    
-    return [];
+    // Use consistent 1-based indexing to match parser output
+    // Parser uses `index + 1` for row numbers, so we need `rowIndex + 1` here
+    return validationErrors.filter(error => error.row === rowIndex + 1);
   };
 
   const hasRowError = (rowIndex: number) => {
@@ -149,20 +141,20 @@ export function DataGrid<T>({
             className="pl-8"
           />
         </div>
-        {validationErrors.length > 0 && (
+        {dataRowErrors.length > 0 && (
           <Badge variant="destructive" className="flex items-center gap-1">
             <AlertCircle className="h-3 w-3" />
-            {validationErrors.length} validation errors
+            {dataRowErrors.length} validation errors
           </Badge>
         )}
       </div>
 
       {/* Validation Summary Alert */}
-      {validationErrors.length > 0 && (
+      {dataRowErrors.length > 0 && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            Found {validationErrors.length} validation errors in your data. 
+            Found {dataRowErrors.length} validation errors in your data. 
             Rows with errors are highlighted below.
           </AlertDescription>
         </Alert>

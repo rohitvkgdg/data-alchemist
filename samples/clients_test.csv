@@ -1,18 +1,19 @@
-id,name,email,phone,status,address,metadata
-C001,Acme Corporation,john.doe@acme.com,(555) 123-4567,active,"123 Business Ave, New York, NY 10001","{""budget"":100000,""deadline"":""2025-12-31"",""industry"":""technology""}"
-C002,TechStart Inc,mary.smith@techstart.com,(555) 234-5678,active,"456 Startup St, San Francisco, CA 94102","{""budget"":25000,""agile"":true,""stage"":""series_a""}"
-C003,Global Solutions,contact@global.com,(555) 345-6789,active,"789 Enterprise Blvd, Chicago, IL 60601","{""budget"":75000,""locations"":[""NY"",""LA"",""SF""],""priority"":""high""}"
-C004,Local Business,owner@localbiz.com,(555) 456-7890,pending,"321 Main St, Denver, CO 80202","{""budget"":10000,""timeline"":""6 months""}"
-C005,Innovation Labs,research@innovationlabs.com,(555) 567-8901,active,"654 Research Park, Boston, MA 02101","{""budget"":150000,""experimental"":true,""research_grant"":true}"
-C006,Retail Chain,info@retailchain.com,(555) 678-9012,active,"987 Commerce Dr, Atlanta, GA 30301","{""stores"":50,""seasonal"":true,""peak_season"":""Q4""}"
-C007,Healthcare Plus,admin@healthcareplus.com,(555) 789-0123,active,"147 Medical Center, Houston, TX 77001","{""compliance"":""HIPAA"",""critical"":true,""patients"":10000}"
-C008,EduTech Solutions,support@edutech.com,(555) 890-1234,pending,"258 Education Way, Seattle, WA 98101","{""students"":5000,""online_platform"":true}"
-C009,FinanceFirst,contact@financefirst.com,(555) 901-2345,active,"369 Finance Plaza, Miami, FL 33101","{""regulations"":[""SOX"",""PCI""],""security"":""high""}"
-C010,GreenEnergy Co,info@greenenergy.com,(555) 012-3456,active,"741 Eco Drive, Portland, OR 97201","{""renewable"":true,""government_contract"":true}"
-DUPLICATE,Duplicate Test,duplicate@test.com,(555) 123-4567,active,"123 Duplicate Ave, Test City, TC 12345","{""duplicate_test"":true}"
-C001,ID Collision,collision@test.com,(555) 999-8888,pending,"999 Collision St, Error City, EC 99999","{""duplicate_id"":true}"
-C011,Missing Email,,""(555) 111-2222"",active,"111 No Email St, Missing City, MC 11111","{""issue"":""missing email""}"
-,No ID Client,noid@test.com,(555) 222-3333,pending,"222 No ID Ave, Missing City, MC 22222","{""issue"":""missing ID""}"
-C012,Invalid Email,not-an-email,""(555) 333-4444"",active,"333 Invalid St, Bad Format, BF 33333","{""issue"":""invalid email format""}"
-C013,Invalid JSON,json@test.com,(555) 444-5555,active,"444 JSON Error Rd, Parse City, PC 44444",invalid json format here
-C014,Invalid Status,status@test.com,(555) 555-6666,unknown,"555 Status St, Invalid City, IC 55555","{""issue"":""invalid status value""}"
+id,name,priorityLevel,requestedTaskIDs,groupTag,attributesJSON,email,phone,address,status
+C001,Acme Corporation,5,"T001,T002,T003",Enterprise,"{""budget"":100000,""deadline"":""2025-12-31"",""industry"":""technology""}",john.doe@acme.com,(555) 123-4567,"123 Business Ave, New York, NY 10001",active
+C002,TechStart Inc,4,"T001,T004",Startup,"{""budget"":25000,""agile"":true,""stage"":""series_a""}",mary.smith@techstart.com,(555) 234-5678,"456 Startup St, San Francisco, CA 94102",active
+C003,Global Solutions,5,"T002,T005,T006",Enterprise,"{""budget"":75000,""locations"":[""NY"",""LA"",""SF""],""priority"":""high""}",contact@global.com,(555) 345-6789,"789 Enterprise Blvd, Chicago, IL 60601",active
+C004,Local Business,2,"T007",SMB,"{""budget"":10000,""timeline"":""6 months""}",owner@localbiz.com,(555) 456-7890,"321 Main St, Denver, CO 80202",pending
+C005,Innovation Labs,5,"T008,T009,T010",Research,"{""budget"":150000,""experimental"":true,""research_grant"":true}",research@innovationlabs.com,(555) 567-8901,"654 Research Park, Boston, MA 02101",active
+C006,Retail Chain,3,"T011,T012",Retail,"{""stores"":50,""seasonal"":true,""peak_season"":""Q4""}",info@retailchain.com,(555) 678-9012,"987 Commerce Dr, Atlanta, GA 30301",active
+C007,Healthcare Plus,5,"T013,T014,T015",Healthcare,"{""compliance"":""HIPAA"",""critical"":true,""patients"":10000}",admin@healthcareplus.com,(555) 789-0123,"147 Medical Center, Houston, TX 77001",active
+C008,EduTech Solutions,3,"T016,T017",Education,"{""students"":5000,""online_platform"":true}",support@edutech.com,(555) 890-1234,"258 Education Way, Seattle, WA 98101",pending
+C009,FinanceFirst,5,"T018,T019,T020",Finance,"{""regulations"":[""SOX"",""PCI""],""security"":""high""}",contact@financefirst.com,(555) 901-2345,"369 Finance Plaza, Miami, FL 33101",active
+C010,GreenEnergy Co,4,"T021,T022",Government,"{""renewable"":true,""government_contract"":true}",info@greenenergy.com,(555) 012-3456,"741 Eco Drive, Portland, OR 97201",active
+DUPLICATE,Duplicate Test,3,"T001,T002",Enterprise,"{""duplicate_test"":true}",duplicate@test.com,(555) 123-4567,"123 Duplicate Ave, Test City, TC 12345",active
+C001,ID Collision,2,"T999",Enterprise,"{""duplicate_id"":true}",collision@test.com,(555) 999-8888,"999 Collision St, Error City, EC 99999",pending
+C011,Missing Email,3,"T001,T002",,"{""issue"":""missing email""}",,(555) 111-2222,"111 No Email St, Missing City, MC 11111",active
+,No ID Client,2,"T003",SMB,"{""issue"":""missing ID""}",noid@test.com,(555) 222-3333,"222 No ID Ave, Missing City, MC 22222",pending
+C012,Invalid Email,6,"T999",Enterprise,"{""issue"":""invalid priority level""}",not-an-email,(555) 333-4444,"333 Invalid St, Bad Format, BF 33333",active
+C013,Invalid JSON,3,"INVALID_TASK_ID",Enterprise,"invalid json format here",json@test.com,(555) 444-5555,"444 JSON Error Rd, Parse City, PC 44444",active
+C014,Invalid Status,3,"T001,T002",Enterprise,"{""issue"":""invalid status value""}",status@test.com,(555) 555-6666,"555 Status St, Invalid City, IC 55555",unknown
+C015,Missing Required Tasks,1,,General,"{""note"":""no tasks requested""}",notasks@test.com,(555) 666-7777,"666 No Tasks Ave, Empty City, EC 66666",active
