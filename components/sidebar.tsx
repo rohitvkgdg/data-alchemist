@@ -1,5 +1,6 @@
-import { useState } from "react";
 import { Upload, BarChart3, Table, FileText, Settings } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
     Sidebar,
     SidebarContent,
@@ -14,22 +15,22 @@ import {
 import { useSidebar } from "@/components/ui/sidebar";
 
 const navigation = [
-    { name: "Upload Data", href: "#", icon: Upload, current: true },
-    { name: "Visualize", href: "#", icon: BarChart3, current: false },
-    { name: "Data Table", href: "#", icon: Table, current: false },
-    { name: "Reports", href: "#", icon: FileText, current: false },
-    { name: "Settings", href: "#", icon: Settings, current: false },
+    { name: "Upload Data", href: "/", icon: Upload },
+    { name: "Data Table", href: "/data-table", icon: Table },
+    { name: "Visualize", href: "/analytics", icon: BarChart3 },
+    { name: "Rules", href: "/rules", icon: FileText },
 ];
 
 export function AppSidebar() {
     const { state, isMobile } = useSidebar();
-    const isCollapsed = state === "collapsed";
+    const pathname = usePathname();
+    
     return (
         <Sidebar collapsible="icon">
             <SidebarHeader>
                 {isMobile ? (
                     <div className="flex items-center justify-between p-2">
-                        <h2 className="text-lg font-thin">Data Alchemist</h2>
+                        <h2 className="text-lg font-extrabold">Data Alchemist</h2>
                         <SidebarTrigger />
                     </div>
                 ) : (
@@ -40,7 +41,7 @@ export function AppSidebar() {
                         </SidebarTrigger>
                     ) : (
                         <div className="flex items-center justify-between p-2">
-                            <h2 className="text-lg font-thin">Data Alchemist</h2>
+                            <h2 className="text-lg font-extrabold">Data Alchemist</h2>
                             <SidebarTrigger />
                         </div>
                     )
@@ -53,11 +54,11 @@ export function AppSidebar() {
                         <SidebarMenu className="flex flex-col gap-1">
                             {navigation.map((item) => (
                                 <SidebarMenuItem key={item.name}>
-                                    <SidebarMenuButton asChild isActive={item.current} className="py-5">
-                                        <a href={item.href}>
+                                    <SidebarMenuButton asChild isActive={pathname === item.href} className="py-5">
+                                        <Link href={item.href}>
                                             <item.icon />
                                             <span>{item.name}</span>
-                                        </a>
+                                        </Link>
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
                             ))}

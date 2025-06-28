@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
+import { FloatingAIAssistant } from "@/components/ai/floating-ai-assistant";
 import { Plus_Jakarta_Sans } from 'next/font/google'
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -35,6 +37,8 @@ export default function RootLayout({
           <div className="flex h-screen w-full bg-background">
             {children}
           </div>
+          <FloatingAIAssistant />
+          <Toaster />
         </SidebarProvider>
       </ThemeProvider>
       </body>

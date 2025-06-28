@@ -3,8 +3,11 @@ import React, { useRef, useState } from "react";
 import { motion } from "motion/react";
 import { IconUpload } from "@tabler/icons-react";
 import { useDropzone } from "react-dropzone";
+import { useRouter } from "next/navigation";
 import { FileParser, DataType } from '@/lib/parser';
 import { useDataStore } from '@/store/data-store';
+import { Client, Worker, Task, ValidationResult } from '@/types/data-models';
+import { toast } from 'sonner';
 
 const mainVariant = {
   initial: {
@@ -29,12 +32,13 @@ const secondaryVariant = {
 
 export const FileUpload = ({
   onChange,
-  dataType = 'clients' // Add default data type
+  dataType = 'clients'
 }: {
   onChange?: (files: File[]) => void;
   dataType?: DataType;
 }) => {
-  const { setClients, setWorkers, setTasks, setUploadState } = useDataStore();
+  const router = useRouter();
+  const { setClients, setWorkers, setTasks, setUploadState, validateCrossReferences } = useDataStore();
   const [files, setFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -42,41 +46,76 @@ export const FileUpload = ({
     if (newFiles.length === 0) return;
     
     const file = newFiles[0];
-    console.log("File selected:", file);
     
-    // Set uploading state
     setUploadState(true, 0);
     
+    toast.info('Processing file...', {
+      description: `Parsing ${file.name} (${dataType})`
+    });
+    
     try {
-      // Parse the file
       const result = await FileParser.parseFile(file, dataType);
       
-      console.log("Parsing result:", result);
-      console.log("Valid data:", result.data);
-      console.log("Errors:", result.errors);
-      
-      // Store the data based on type
       switch (dataType) {
         case 'clients':
-          setClients(result.data, result);
+          setClients(result.data as Client[], result as ValidationResult<Client>);
           break;
         case 'workers':
-          setWorkers(result.data, result);
+          setWorkers(result.data as Worker[], result as ValidationResult<Worker>);
           break;
         case 'tasks':
-          setTasks(result.data, result);
+          setTasks(result.data as Task[], result as ValidationResult<Task>);
           break;
       }
       
       setUploadState(false, 100);
       
-    } catch (error) {
-      console.error("Error processing file:", error);
+      // Run cross-reference validation after upload
+      setTimeout(() => {
+        validateCrossReferences();
+      }, 100);
+      
+      const totalRows = result.data.length;
+      const errorCount = result.errors?.length || 0;
+      
+      if (errorCount > 0) {
+        toast.warning('File uploaded with warnings', {
+          description: `${totalRows} records uploaded, ${errorCount} validation errors found.`,
+          action: {
+            label: "🤖 Get AI Help",
+            onClick: () => {
+              router.push('/data-table?tab=ai&query=suggest data corrections');
+            },
+          },
+        });
+      } else {
+        toast.success('File uploaded successfully!', {
+          description: `${totalRows} ${dataType} records imported.`,
+          action: {
+            label: "🤖 AI Analysis",
+            onClick: () => {
+              router.push('/data-table?tab=ai&query=analyze my data');
+            },
+          },
+        });
+      }
+
+      // Navigate to data-table page after successful upload
+      setTimeout(() => {
+        router.push('/data-table');
+      }, 1500); // Small delay to show the success message
+      
+    } catch {
       setUploadState(false, 0);
+      toast.error('Upload failed', {
+        description: 'There was an error processing your file. Please check the format and try again.'
+      });
     }
     
     setFiles((prevFiles) => [...prevFiles, ...newFiles]);
-    onChange && onChange(newFiles);
+    if (onChange) {
+      onChange(newFiles);
+    }
   };
 
   const handleClick = () => {
@@ -94,8 +133,10 @@ export const FileUpload = ({
       "application/vnd.ms-excel": [".xls"],
     },
     onDrop: handleFileChange,
-    onDropRejected: (error) => {
-      console.log(error);
+    onDropRejected: () => {
+      toast.error('Invalid file type', {
+        description: 'Please upload a CSV or Excel file (.csv, .xlsx, .xls).'
+      });
     },
   });
 
@@ -104,7 +145,7 @@ export const FileUpload = ({
       <motion.div
         onClick={handleClick}
         whileHover=""
-        className="p-10 group/file block rounded-lg cursor-pointer w-full relative overflow-hidden"
+        className="p-0 group/file block rounded-lg cursor-pointer w-full relative overflow-hidden"
       >
         <input
           ref={fileInputRef}
@@ -113,14 +154,14 @@ export const FileUpload = ({
           onChange={(e) => handleFileChange(Array.from(e.target.files || []))}
           className="hidden"
         />
-        <div className="flex flex-col items-center justify-center">
+        <div className="flex flex-col border p-6 rounded-xl text-center items-center justify-center">
           <p className="relative z-20 font-sans font-bold text-neutral-700 dark:text-neutral-300 text-base">
             Upload file
           </p>
           <p className="relative z-20 font-sans font-normal text-neutral-400 dark:text-neutral-400 text-base mt-2">
-            Drag or drop your files here or click to upload
+            Drag and drop your files here or click to upload
           </p>
-          <div className="relative w-full mt-10 max-w-xl mx-auto">
+          <div className="relative w-full mt-4 max-w-xl mx-auto">
             {files.length > 0 &&
               files.map((file, idx) => (
                 <motion.div
@@ -146,7 +187,10 @@ export const FileUpload = ({
                       layout
                       className="rounded-lg px-2 py-1 w-fit shrink-0 text-sm text-neutral-600 dark:bg-neutral-800 dark:text-white shadow-input"
                     >
-                      {(file.size / (1024 * 1024)).toFixed(2)} MB
+                      {file.size >= 1024 * 1024 
+                      ? `${(file.size / (1024 * 1024)).toFixed(2)} MB`
+                      : `${(file.size / 1024).toFixed(2)} KB`
+                      }
                     </motion.p>
                   </div>
 
